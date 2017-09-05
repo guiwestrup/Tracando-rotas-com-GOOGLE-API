@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbwuvKzgXf90D9vO_VyWpIVRNbql08_8E"></script>
+    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script>
+      var map;
+      var local = [];
+      function inicializa() 
+      {
+        map = new google.maps.Map(document.getElementById('map'), 
+        {
+
+          center: 
+          {
+            lat: -26.490750, 
+            lng: -49.077101
+          },
+          zoom: 10,
+          zoomControlOption: 
+          {
+            position: google.maps.ControlPosition.LEFT_TOP
+          }
+        });
+      }
+      google.maps.event.addDomListener(window, 'load', inicializa);
+
+      //função para buscar no json
+      function buscaLocal()
+      {
+        $.ajax(
+        {
+          type: "GET",
+          url: "jason.json",
+          dataType: "json",
+          success: function(data)
+          {
+            var d = new google.maps.InfoWindow();
+            var e;
+            $.each(data,function(i,b)
+            {
+              e = new google.maps.Marker(
+              {
+                position: new google.maps.LatLng(b.lat,b.lng),
+                map: map
+              });
+
+              local.push(e);
+
+              google.maps.event.addListener(e,'click', (function(a,i)
+              {
+                return function()
+                {
+                  d.setContent('<div><h3>'+b.endereco+'</h3></div>');
+                  d.open(map, a)
+                }
+              })(e, i))
+            });
+          }
+        });
+      }
+
+      $(function()
+      {
+        buscaLocal();
+      });
+    </script>
+    
+  </body>
+</html>
